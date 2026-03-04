@@ -1,0 +1,9 @@
+.git
+.github
+.idea
+.vscode
+.cursor
+tmp
+build
+cmake-build-*
+*.log

@@ -70,8 +70,8 @@ surge_external_proxy:
   resolve_hostname: true
 
 emojis:
-  add_emoji: true
-  remove_old_emoji: true
+  add_emoji: false
+  remove_old_emoji: false
   rules:
 #  - {match: "(流量|时间|应急)", emoji: "🏳️‍🌈"}
 #  - {script: "function getEmoji(node){}"}
@@ -146,11 +146,11 @@ advanced:
   log_level: info
   print_debug_info: false
   max_pending_connections: 10240
-  max_concurrent_threads: 2
+  max_concurrent_threads: 4
   max_allowed_rulesets: 0
   max_allowed_rules: 0
   max_allowed_download_size: 0
-  enable_cache: false
+  enable_cache: true
   cache_subscription: 60
   cache_config: 300
   cache_ruleset: 21600

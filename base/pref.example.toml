@@ -173,7 +173,7 @@ resolve_hostname = true
 
 [emojis]
 add_emoji = false
-remove_old_emoji = true
+remove_old_emoji = false
 
 [[emojis.emoji]]
 #match = '(流量|时间|应急)'

@@ -1,7 +1,9 @@
 name: Publish Docker Image
 on:
   push:
-    branches: [ master ]
+    branches:
+      - master
+      - integration/chain-subconverter
     tags:
       - '**'
   workflow_dispatch:
@@ -78,6 +80,8 @@ jobs:
           tags: |
             type=semver,pattern={{version}}
             type=raw,value=latest,enable=${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
+            type=raw,value=integration-chain-subconverter,enable=${{ github.event_name == 'push' && github.ref == 'refs/heads/integration/chain-subconverter' }}
+            type=raw,value=integration-chain-subconverter,enable=${{ github.event_name == 'workflow_dispatch' && github.event.inputs.ref == 'integration/chain-subconverter' }}
       - name: Docker login
         uses: docker/login-action@v3
         with:
@@ -151,6 +155,8 @@ jobs:
           tags: |
             type=semver,pattern={{version}}
             type=raw,value=latest,enable=${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
+            type=raw,value=integration-chain-subconverter,enable=${{ github.event_name == 'push' && github.ref == 'refs/heads/integration/chain-subconverter' }}
+            type=raw,value=integration-chain-subconverter,enable=${{ github.event_name == 'workflow_dispatch' && github.event.inputs.ref == 'integration/chain-subconverter' }}
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
         with:
@@ -212,6 +218,8 @@ jobs:
           tags: |
             type=semver,pattern={{version}}
             type=raw,value=latest,enable=${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
+            type=raw,value=integration-chain-subconverter,enable=${{ github.event_name == 'push' && github.ref == 'refs/heads/integration/chain-subconverter' }}
+            type=raw,value=integration-chain-subconverter,enable=${{ github.event_name == 'workflow_dispatch' && github.event.inputs.ref == 'integration/chain-subconverter' }}
       - name: Docker login
         uses: docker/login-action@v3
         with:
@@ -249,6 +257,8 @@ jobs:
           tags: |
             type=semver,pattern={{version}}
             type=raw,value=latest,enable=${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
+            type=raw,value=integration-chain-subconverter,enable=${{ github.event_name == 'push' && github.ref == 'refs/heads/integration/chain-subconverter' }}
+            type=raw,value=integration-chain-subconverter,enable=${{ github.event_name == 'workflow_dispatch' && github.event.inputs.ref == 'integration/chain-subconverter' }}
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
         with:

@@ -16,6 +16,8 @@ cd ..
 git clone https://github.com/ftk/quickjspp --depth=1
 cd quickjspp
 patch quickjs/quickjs-libc.c -i ../scripts/patches/0001-quickjs-libc-add-realpath-for-Windows.patch
+sed -i 's/set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)/set(CMAKE_INTERPROCEDURAL_OPTIMIZATION FALSE)/' CMakeLists.txt
+grep -q 'set(CMAKE_INTERPROCEDURAL_OPTIMIZATION FALSE)' CMakeLists.txt
 cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release .
 make quickjs -j4
 install -d "$MINGW_PREFIX/lib/quickjs/"

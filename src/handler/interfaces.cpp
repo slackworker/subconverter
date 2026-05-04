@@ -84,6 +84,81 @@ const std::vector<UAProfile> UAMatchList = {
     {"V2RayX","","","v2ray"}
 };
 
+namespace {
+
+bool isManagedClashTypedRuleset(const std::string &rule_url)
+{
+    return startsWith(rule_url, "clash-domain:") || startsWith(rule_url, "clash-ipcidr:") || startsWith(rule_url, "clash-classic:");
+}
+
+bool isInlineRuleset(const std::string &rule_url)
+{
+    return rule_url.find("[]") != std::string::npos;
+}
+
+bool canUseManagedClashRulesetPlaceholders(const std::string &target, const extra_settings &ext, const RulesetConfigs &rulesets)
+{
+    if((target != "clash" && target != "clashr") || ext.managed_config_prefix.empty() || ext.clash_script)
+        return false;
+    if(!ext.enable_rule_generator || ext.nodelist)
+        return false;
+
+    return std::all_of(rulesets.begin(), rulesets.end(), [](const RulesetConfig &rule)
+    {
+        return isInlineRuleset(rule.Url) || isManagedClashTypedRuleset(rule.Url);
+    });
+}
+
+std::vector<RulesetContent> buildManagedClashRulesetPlaceholders(const RulesetConfigs &rulesets)
+{
+    std::vector<RulesetContent> ruleset_content_array;
+    ruleset_content_array.reserve(rulesets.size());
+
+    for(const RulesetConfig &rule : rulesets)
+    {
+        std::string rule_url = rule.Url;
+        ruleset_type type = RULESET_SURGE;
+
+        std::string::size_type pos = rule_url.find("[]");
+        if(pos != std::string::npos)
+        {
+            ruleset_content_array.emplace_back(RulesetContent{
+                rule.Group,
+                "",
+                "",
+                RULESET_SURGE,
+                std::async(std::launch::async, [rule_url, pos](){ return rule_url.substr(pos); }),
+                0,
+            });
+            continue;
+        }
+
+        if(startsWith(rule_url, "clash-domain:"))
+        {
+            rule_url.erase(0, std::string("clash-domain:").size());
+            type = RULESET_CLASH_DOMAIN;
+        }
+        else if(startsWith(rule_url, "clash-ipcidr:"))
+        {
+            rule_url.erase(0, std::string("clash-ipcidr:").size());
+            type = RULESET_CLASH_IPCIDR;
+        }
+        else if(startsWith(rule_url, "clash-classic:"))
+        {
+            rule_url.erase(0, std::string("clash-classic:").size());
+            type = RULESET_CLASH_CLASSICAL;
+        }
+
+        std::promise<std::string> empty_rule_content;
+        empty_rule_content.set_value("");
+        ruleset_content_array.emplace_back(RulesetContent{rule.Group, rule_url, rule.Url, type, empty_rule_content.get_future().share(), rule.Interval});
+    }
+
+    return ruleset_content_array;
+}
+
+}
+
 bool verGreaterEqual(const std::string& src_ver, const std::string& target_ver)
 {
     std::istringstream src_stream(src_ver), target_stream(target_ver);
@@ -507,7 +582,9 @@ std::string subconverter(RESPONSE_CALLBACK_ARGS)
     }
     if(ext.enable_rule_generator && !ext.nodelist && !lSimpleSubscription)
     {
-        if(lCustomRulesets != global.customRulesets)
+        if(canUseManagedClashRulesetPlaceholders(argTarget, ext, lCustomRulesets))
+            lRulesetContent = buildManagedClashRulesetPlaceholders(lCustomRulesets);
+        else if(lCustomRulesets != global.customRulesets)
             refreshRulesets(lCustomRulesets, lRulesetContent);
         else
         {

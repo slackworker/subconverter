@@ -63,6 +63,13 @@ endif()
 
 mark_as_advanced(RAPIDJSON_FOUND)
 
+include(FindPackageHandleStandardArgs)
+find_package_handle_standard_args(
+  Rapidjson
+  REQUIRED_VARS RAPIDJSON_INCLUDE_DIRS
+  FAIL_MESSAGE "Could not find rapidjson headers. Install rapidjson-dev or set RAPIDJSON_INCLUDEDIR."
+)
+
 if(RAPIDJSON_USE_SSE42)
   set(RAPIDJSON_CXX_FLAGS "-DRAPIDJSON_SSE42")
   if(MSVC)
@@ -84,14 +91,12 @@ endif()
 mark_as_advanced(RAPIDJSON_CXX_FLAGS)
 
 if(RAPIDJSON_FOUND)
-  if(NOT rapidjson_FIND_QUIETLY)
+  if(NOT Rapidjson_FIND_QUIETLY AND NOT rapidjson_FIND_QUIETLY)
     message(STATUS "Found rapidjson header files in ${RAPIDJSON_INCLUDE_DIRS}")
     if(DEFINED RAPIDJSON_CXX_FLAGS)
       message(STATUS "Found rapidjson C++ extra compilation flags: ${RAPIDJSON_CXX_FLAGS}")
     endif()
   endif()
-elseif(rapidjson_FIND_REQUIRED)
-    message(FATAL_ERROR "Could not find rapidjson")
 else()
   message(STATUS "Optional package rapidjson was not found")
 endif()

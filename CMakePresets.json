@@ -1,0 +1,23 @@
+{
+  "version": 3,
+  "configurePresets": [
+    {
+      "name": "local-deps",
+      "displayName": "Local dependencies",
+      "generator": "Unix Makefiles",
+      "binaryDir": "${sourceDir}/build",
+      "cacheVariables": {
+        "CMAKE_PREFIX_PATH": "${sourceDir}/.deps/prefix"
+      },
+      "environment": {
+        "PKG_CONFIG_PATH": "${sourceDir}/.deps/prefix/lib/pkgconfig"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "local-deps",
+      "configurePreset": "local-deps"
+    }
+  ]
+}
